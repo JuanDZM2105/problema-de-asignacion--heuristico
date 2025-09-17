@@ -4,17 +4,87 @@
 
 ### 📌 Flujograma detallado
 
-```mermaid
-flowchart TD
-    A([Inicio]) --> B[Entrada: instance JSON<br/>Days, Zones, Desks_Z, Days_E, Desks_E, Employees_G]
-    B --> C[Construcción de mapa<br/>Empleado → Grupo]
-    C --> D[Asignación de día de reunión<br/>por grupo]
-    D --> E[Cálculo de capacidad residual<br/>por día]
-    E --> F[Asignación de segundo día<br/>por empleado]
-    F --> G[Construcción del calendario<br/>por día]
-    G --> H[Asignación de asientos<br/>(crear_solucion)]
-    H --> I([Salida:<br/>solución detallada + groups_days])
-```
+### 📊 Comparativa de métodos – Instancia 1
+
+| Método        | n_runs | Mean Valid | Mean Pref | Mean Isolated | **Mejor Solución (valid, pref, isolated)** | Tiempo (s) |
+|---------------|--------|------------|-----------|---------------|--------------------------------------------|------------|
+| Randomized    | 1000   | 2.891      | 6.974     | 9.364         | **(0, 6, 8)**                              | 0.685      |
+| Constructive  | 1      | 3.000      | 9.000     | 7.000         | (3, 9, 7)                                  | **0.0005** |
+| Annealing     | 1000   | 2.000      | 9.000     | 9.000         | (2, 9, 9)                                  | 0.282      |
+
+
+### 📋 Asignaciones por empleado – Mejor solución Randomized
+| Employees | L    | Ma   | Mi   | J    | V    |
+|-----------|------|------|------|------|------|
+| E0        | None | None | D7   | D3   | None |
+| E1        | None | D2   | D4   | None | None |
+| E2        | None | D3   | D0   | None | None |
+| E3        | D4   | None | D1   | None | None |
+| E4        | None | D1   | D6   | None | None |
+| E5        | None | D7   | None | D0   | None |
+| E6        | None | None | D5   | D7   | None |
+| E7        | None | D5   | None | D4   | None |
+| E8        | None | None | None | D8   | D0   |
+| E9        | None | D6   | None | D6   | None |
+| E10       | D6   | D4   | None | None | None |
+| E11       | D7   | None | None | None | D6   |
+| E12       | D0   | None | None | D2   | None |
+| E13       | D1   | None | None | None | D8   |
+| E14       | D3   | D0   | None | None | None |
+| E15       | None | None | D3   | None | D4   |
+| E16       | D8   | None | None | None | D5   |
+| E17       | None | None | D2   | None | D1   |
+| E18       | None | D8   | None | None | D7   |
+| E19       | None | None | None | D1   | D3   |
+➡️ **Mejor resultado: (0, 6, 8)**
+### 📋 Asignaciones por empleado – Constructive
+| Employees | L    | Ma   | Mi   | J    | V    |
+|-----------|------|------|------|------|------|
+| E0        | D4   | None | D4   | None | None |
+| E1        | None | D2   | D2   | None | None |
+| E2        | D1   | None | D1   | None | None |
+| E3        | D2   | None | D6   | None | None |
+| E4        | D5   | None | D0   | None | None |
+| E5        | None | D0   | None | D2   | None |
+| E6        | None | D4   | D5   | None | None |
+| E7        | None | D1   | D3   | None | None |
+| E8        | None | D8   | None | D0   | None |
+| E9        | None | D7   | D8   | None | None |
+| E10       | D6   | D6   | None | None | None |
+| E11       | D0   | None | None | None | D1   |
+| E12       | D3   | None | D7   | None | None |
+| E13       | D8   | None | None | None | D4   |
+| E14       | D7   | D5   | None | None | None |
+| E15       | None | D3   | None | None | D3   |
+| E16       | None | None | None | D4   | D8   |
+| E17       | None | None | None | D1   | D5   |
+| E18       | None | None | None | D5   | D7   |
+| E19       | None | None | None | D7   | D6   |
+➡️ **Resultado: (3, 9, 7)**
+### 📋 Asignaciones por empleado – Annealing
+| Employees | L    | Ma   | Mi   | J    | V    |
+|-----------|------|------|------|------|------|
+| E0        | D5   | None | D4   | None | None |
+| E1        | None | D2   | D2   | None | None |
+| E2        | D1   | None | D1   | None | None |
+| E3        | D4   | None | D6   | None | None |
+| E4        | D2   | None | D0   | None | None |
+| E5        | None | D0   | None | D2   | None |
+| E6        | None | D4   | D7   | None | None |
+| E7        | None | D1   | D3   | None | None |
+| E8        | None | D8   | None | D0   | None |
+| E9        | None | D7   | D8   | None | None |
+| E10       | D6   | D6   | None | None | None |
+| E11       | D0   | None | None | None | D1   |
+| E12       | D3   | None | D5   | None | None |
+| E13       | D8   | None | None | None | D4   |
+| E14       | D7   | D3   | None | None | None |
+| E15       | None | D5   | None | None | D3   |
+| E16       | None | None | None | D5   | D8   |
+| E17       | None | None | None | D1   | D5   |
+| E18       | None | None | None | D7   | D7   |
+| E19       | None | None | None | D4   | D6   |
+➡️ **Resultado: (2, 9, 9)**
 
 ---
 
