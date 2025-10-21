@@ -32,7 +32,7 @@ def solution_to_employee_table(sol, days=("L","Ma","Mi","J","V")) -> pd.DataFram
     return df
 
 
-archivo = "instances/instance10.json"
+archivo = "instances/instance1.json"
 N = 1000
 
 # ---------------------------
