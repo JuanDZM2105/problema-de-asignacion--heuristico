@@ -6,25 +6,17 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 ---
 
 # Índice
-
-1. [Introducción](#proyecto-heurística--asignación-de-escritorios)  
-2. [Estructura del proyecto](#-estructura-del-proyecto)  
-3. [Descripción de archivos principales](#-descripción-de-archivos-principales)  
-4. [Resultados de Métodos de Asignación de Empleados](#resultados-de-métodos-de-asignación-de-empleados)  
-   4.1. [Métodos incluidos](#métodos-incluidos)  
-   4.2. [Archivos generados y estructura](#archivos-generados-y-estructura)  
-       4.2.1. [Resumen general de métodos (summary)](#1-resumen-general-de-métodos-summary)  
-       4.2.2. [Tablas de asignación por empleado](#2-tablas-de-asignación-por-empleado)  
-5. [Entrega 2: Búsqueda Local y Metaheurístico VNS](#entrega-2-búsqueda-local)  
-   5.1. [Descripción del método](#descripción-del-método)  
-   5.2. [Vecindario utilizado](#vecindario-utilizado)  
-   5.3. [Estrategias de mejora](#estrategias-de-mejora)  
-   5.4. [Metaheurístico: Variable Neighborhood Search (VNS)](#metaheurístico-de-búsqueda-local-variable-neighborhood-search-vns)  
-       5.4.1. [Idea general](#idea-general)  
-       5.4.2. [Vecindarios implementados](#vecindarios-implementados)  
-       5.4.3. [Búsqueda local dentro de cada vecindario](#búsqueda-local-dentro-de-cada-vecindario)  
-6. [Ejecución del programa](#-ejecución)  
-7. [Autor y créditos](#️-autor-y-créditos)
+ 
+1. [Estructura del proyecto](#-estructura-del-proyecto)  
+2. [Descripción de archivos principales](#-descripción-de-archivos-principales)  
+3. [Resultados de Métodos de Asignación de Empleados](#resultados-de-métodos-de-asignación-de-empleados)  
+   3.1. [Métodos incluidos](#métodos-incluidos)  
+   3.2. [Archivos generados y estructura](#archivos-generados-y-estructura)  
+4. [Entrega 2: Búsqueda Local y Metaheurístico VNS](#entrega-2-búsqueda-local)  
+   4.2. [Vecindario utilizado](#vecindario-utilizado)  
+   4.3. [Estrategias de mejora](#estrategias-de-mejora)  
+   4.4. [Metaheurístico: Variable Neighborhood Search (VNS)](#metaheurístico-de-búsqueda-local-variable-neighborhood-search-vns)  
+5. [Ejecución del programa](#-ejecución)  
 
 ---
 
