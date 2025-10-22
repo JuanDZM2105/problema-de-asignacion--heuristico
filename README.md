@@ -5,6 +5,21 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 
 ---
 
+# Índice
+ 
+1. [Estructura del proyecto](#-estructura-del-proyecto)  
+2. [Descripción de archivos principales](#descripción-de-archivos-principales)  
+3. [Resultados de Métodos de Asignación de Empleados](#resultados-de-métodos-de-asignación-de-empleados)  
+   3.1. [Métodos incluidos](#métodos-incluidos)  
+   3.2. [Archivos generados y estructura](#archivos-generados-y-estructura)  
+4. [Entrega 2: Búsqueda Local y Metaheurístico VNS](#entrega-2-búsqueda-local)  
+   4.2. [Vecindario utilizado](#vecindario-utilizado)  
+   4.3. [Estrategias de mejora](#estrategias-de-mejora)  
+   4.4. [Metaheurístico: Variable Neighborhood Search (VNS)](#metaheurístico-de-búsqueda-local-variable-neighborhood-search-vns)  
+5. [Ejecución del programa](#-ejecución)  
+
+---
+
 ## 📂 Estructura del proyecto
 
 ├── instances/ -> Conjunto de instancias en formato JSON (datos de entrada) <br>
@@ -22,7 +37,7 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 
 ---
 
-## ⚙️ Descripción de archivos principales
+## Descripción de archivos principales
 
 - **`instances/`**  
   Contiene las instancias de prueba (archivos `.json`) con la definición de:
@@ -155,7 +170,47 @@ El método implementa dos variantes clásicas de búsqueda local:
 Ambas estrategias repiten el proceso hasta que **no se encuentra ninguna mejora adicional**.
 
 ---
+## Metaheurístico de búsqueda local: Variable Neighborhood Search (VNS)
+Este metaheurístico implementa una versión extendida del algoritmo **VNS (Variable Neighborhood Search)**. El enfoque combina **mutaciones controladas** (vecindarios) con **búsqueda local** dentro de cada vecindario.
 
+---
+
+## Idea general
+
+El algoritmo VNS parte de una **solución inicial válida** y explora una serie de **vecindarios de diferente naturaleza**.  
+En cada uno:
+1. Se **perturba (shaking)** la solución actual mediante una mutación específica.  
+2. Se ejecuta una **búsqueda local** centrada en ese tipo de vecindario para mejorar la solución.  
+3. Si se encuentra una mejora, el proceso vuelve al primer vecindario; si no, pasa al siguiente.
+
+Este ciclo continúa hasta alcanzar el número máximo de iteraciones o hasta no encontrar mejoras después de varios intentos.
+
+---
+
+## Vecindarios implementados
+
+Cada tipo de vecindario representa un patrón de cambio (*movimiento*) diferente sobre la solución actual:
+
+| Vecindario | Descripción breve | Propósito |
+|-------------|------------------|------------|
+| **N1** | **Swap dentro de la misma zona** | Intercambia empleados que comparten zona y día. Pequeñas mejoras locales. |
+| **N2** | **Swap entre zonas del mismo día** | Mueve empleados entre distintas zonas, manteniendo el día. Favorece el balance entre zonas. |
+| **N3** | **Mover día libre** | Reasigna un empleado a un día alternativo de su preferencia (si tiene cupo). Mejora satisfacción individual. |
+| **N4** | **Reubicar aislado** | Detecta empleados sin compañeros de grupo y los reubica con su equipo. Reduce aislamiento. |
+| **N5** | **Reasignar zona completa** | Mueve todos los miembros de un grupo a otra zona con capacidad suficiente. Cambios estructurales más grandes. |
+| **N6** | **Reasignar según preferencias** | Corrige asignaciones de empleados que trabajan en días no preferidos. Mejora satisfacción sin romper restricciones. |
+
+Cada mutación garantiza que las restricciones de grupos, cupos y días de reunión se respeten.
+
+---
+
+## Búsqueda local dentro de cada vecindario
+
+Después de aplicar una mutación (`shaking`), el algoritmo ejecuta una **búsqueda local** (`local_search_vns`):
+
+- Explora el vecindario actual hasta que **no se encuentren más mejoras**.
+- Usa estrategia *first-improvement*: acepta la primera mejora detectada (más rápida).
+- La evaluación de cada solución se realiza con `evaluate_solution`, que devuelve una tupla con los indicadores:
 ---
 
 ## 🚀 Ejecución
