@@ -46,23 +46,6 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
   3. Recocido simulado con mutaciones.  
   Luego genera métricas comparativas y exporta resultados en Excel.  
 
-- **`metodo_constructivo.py`**  
-  Implementación del algoritmo determinista:
-  - Asigna día de reunión por grupo.  
-  - Asigna segundo día por empleado.  
-  - Construye el calendario y la solución final.  
-
-- **`metodo_constructivo_aleatorio.py`**  
-  Variante aleatoria del método constructivo:
-  - Introduce aleatoriedad al romper empates.  
-  - Genera soluciones distintas en cada ejecución.  
-
-- **`metodo_aleatorio.py`**  
-  Implementa el **recocido simulado (Simulated Annealing)**:
-  - Parte de una solución inicial (constructiva).  
-  - Aplica mutaciones (swap de escritorios, zonas o días).  
-  - Acepta o rechaza soluciones con probabilidad dependiente de la temperatura.  
-
 - **`score.py`**  
   Funciones de evaluación de soluciones. Devuelve una tupla con:
   1. Asignaciones inválidas.  
@@ -131,6 +114,49 @@ Cada tabla se imprime con su **método correspondiente**:
 - Recocido Simulado  
 - VNS  
 - Búsqueda Local (Best Improvement y First Improvement)
+
+---
+
+# Entrega 2: Búsqueda Local
+
+---
+
+## Descripción del método
+El **método de búsqueda local** parte de una solución inicial generada con el método constructivo y busca **mejoras incrementales** explorando el vecindario de la solución actual.  
+En cada iteración, se genera una nueva solución vecina aplicando un pequeño cambio (un *movimiento*).  
+Si el cambio mejora el valor de la función objetivo, se actualiza la solución actual.  
+El proceso termina cuando **no se encuentran más mejoras**, alcanzando un *óptimo local*.
+
+---
+
+### Vecindario utilizado
+El **vecindario general** está definido por el movimiento:
+
+> *Mover un empleado de un día a otro*, siempre que se cumplan las restricciones.
+
+#### Detalles del movimiento:
+- Solo se mueve un empleado a un día diferente.  
+- **No se permite** moverlo fuera del día asignado a su grupo (`groups_days`).  
+- El día destino debe tener **escritorios disponibles** (`Desks_Z`).  
+- Al realizar el movimiento, se actualizan las asignaciones de días y zonas.
+
+Este vecindario permite **pequeñas modificaciones controladas**, manteniendo la factibilidad de la solución en todo momento.
+
+---
+
+### Estrategias de mejora
+El método implementa dos variantes clásicas de búsqueda local:
+
+| Variante | Descripción |
+|-----------|-------------|
+| `best` | (*Best Improvement*) Recorre todo el vecindario y elige la mejor mejora posible antes de actualizar la solución. Mayor calidad pero más lento. |
+| `first` | (*First Improvement*) Acepta la primera mejora que encuentra. Más rápido pero puede converger antes. |
+
+Ambas estrategias repiten el proceso hasta que **no se encuentra ninguna mejora adicional**.
+
+---
+
+---
 
 ## 🚀 Ejecución
 
