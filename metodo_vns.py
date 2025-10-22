@@ -55,57 +55,93 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
                     new_sol[day][z2][i2] = (desk2, emp1)
  
     # =====================================================
-    # Vecindario 3: MOVER DÍA LIBRE (temporal)
+    # Vecindario 3: MOVER DÍA LIBRE (seguro)
     # =====================================================
     elif neighborhood_type == 3:
         all_emps = list(days_e.keys())
         emp = random.choice(all_emps)
         g = get_group(emp)
         meeting_day = group_meeting_days.get(g)
- 
+
+        # Días donde ya está asignado
         current_days = [
             d for d in new_sol.keys()
             if d != meeting_day and any(emp == e for z in new_sol[d].values() for _, e in z)
         ]
         if not current_days:
             return new_sol
- 
+
         day_from = random.choice(current_days)
+
+        # Días donde podría moverse (según disponibilidad)
         available_days = [
             d for d in days_e[emp]
             if d not in current_days and d != meeting_day
         ]
         if not available_days:
             return new_sol
- 
+
         day_to = random.choice(available_days)
-        zones = list(new_sol[day_to].keys())
-        if not zones:
+        zones_to = list(new_sol[day_to].keys())
+        zones_from = list(new_sol[day_from].keys())
+        if not zones_to or not zones_from:
             return new_sol
-        target_zone = random.choice(zones)
-        if not new_sol[day_to][target_zone]:
+
+        z_to = random.choice(zones_to)
+        z_from = random.choice(zones_from)
+
+        # Buscar el empleado en el día origen
+        idx_emp, desk_emp = None, None
+        for i, (desk, e) in enumerate(new_sol[day_from][z_from]):
+            if e == emp:
+                idx_emp, desk_emp = i, desk
+                break
+        if idx_emp is None:
             return new_sol
- 
-        i_target = random.randrange(len(new_sol[day_to][target_zone]))
-        desk_target, emp_target = new_sol[day_to][target_zone][i_target]
-        for z_name, z_data in new_sol[day_from].items():
-            for idx, (desk, e) in enumerate(z_data):
-                if e == emp:
-                    g2 = get_group(emp_target)
-                    if day_to not in (group_meeting_days.get(g), group_meeting_days.get(g2)):
-                        new_sol[day_from][z_name][idx] = (desk, emp_target)
-                        new_sol[day_to][target_zone][i_target] = (desk_target, emp)
-                    return new_sol
+
+        # Buscar espacio disponible o alguien para hacer swap
+        ocupados = [desk for zonas in new_sol[day_to].values() for desk, _ in zonas]
+        libres = [d for d in desks_z[z_to] if d not in ocupados]
+
+        moved = False
+
+        # 🔹 Caso 1: hay espacio libre → mover directamente
+        if libres:
+            nuevo_desk = random.choice(libres)
+            new_sol[day_to][z_to].append((nuevo_desk, emp))
+            moved = True
+
+        # 🔹 Caso 2: no hay espacio libre → intentar swap
+        elif new_sol[day_to][z_to]:
+            i_target = random.randrange(len(new_sol[day_to][z_to]))
+            desk_target, emp_target = new_sol[day_to][z_to][i_target]
+            g2 = get_group(emp_target)
+
+            # Validar que no se viole día de reunión
+            if day_to not in (group_meeting_days.get(g), group_meeting_days.get(g2)):
+                new_sol[day_to][z_to][i_target] = (desk_target, emp)
+                new_sol[day_from][z_from][idx_emp] = (desk_emp, emp_target)
+                moved = True
+
+        # 🧩 Solo eliminar del origen si el movimiento fue confirmado
+        if moved:
+            # eliminar la asignación anterior (si sigue ahí)
+            new_sol[day_from][z_from] = [
+                (d, e) for d, e in new_sol[day_from][z_from] if e != emp
+            ]
+
+        return new_sol
+
  
     # =====================================================
-    # Vecindario 4: REUBICAR AISLADO
+    # Vecindario 4: REUBICAR AISLADO (seguro)
     # =====================================================
     elif neighborhood_type == 4:
         day = random.choice(list(new_sol.keys()))
         zones = list(new_sol[day].keys())
         if not zones:
             return new_sol
- 
+
         # Detectar empleados aislados
         isolated_emps = []
         for zone in zones:
@@ -116,36 +152,77 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
                 same_group = [e for _, e in new_sol[day][zone] if get_group(e) == g and e != emp]
                 if not same_group:
                     isolated_emps.append((day, zone, emp))
- 
+
         if not isolated_emps:
             return new_sol
- 
+
+        # Elegir un empleado aislado aleatoriamente
         day, zone_from, emp_iso = random.choice(isolated_emps)
         g = get_group(emp_iso)
- 
-        # Buscar la zona con más miembros del mismo grupo
+
+        # Buscar la zona con más miembros del mismo grupo (diferente a la actual)
         best_zone = None
         best_count = 0
         for z in zones:
+            if z == zone_from:
+                continue
             count = sum(1 for _, e in new_sol[day][z] if get_group(e) == g)
-            if count > best_count and z != zone_from:
+            if count > best_count:
                 best_zone = z
                 best_count = count
- 
-        if best_zone:
-            for i, (desk, e) in enumerate(new_sol[day][zone_from]):
-                if e == emp_iso:
-                    desk_from = desk
-                    del new_sol[day][zone_from][i]
-                    break
-            if new_sol[day][best_zone]:
-                i_target = random.randrange(len(new_sol[day][best_zone]))
-                desk_target, emp_target = new_sol[day][best_zone][i_target]
-                g2 = get_group(emp_target)
-                if day not in (group_meeting_days.get(g), group_meeting_days.get(g2)):
-                    new_sol[day][best_zone].insert(i_target, (desk_target, emp_iso))
-            else:
-                new_sol[day][best_zone].append((desk_from, emp_iso))
+
+        if not best_zone:
+            return new_sol
+
+        # Buscar escritorio actual del aislado
+        desk_from = None
+        for (desk, e) in new_sol[day][zone_from]:
+            if e == emp_iso:
+                desk_from = desk
+                break
+
+        if desk_from is None:
+            return new_sol
+
+        # Calcular escritorios ocupados
+        ocupados = [desk for zonas in new_sol[day].values() for desk, _ in zonas]
+        libres = [d for d in desks_z[best_zone] if d not in ocupados]
+
+        moved = False  # bandera para saber si se movió correctamente
+
+        # 🔹 Caso 1: hay espacio libre en la zona destino
+        if libres:
+            nuevo_desk = random.choice(libres)
+            new_sol[day][best_zone].append((nuevo_desk, emp_iso))
+            moved = True
+
+        # 🔹 Caso 2: no hay cupo → intentar hacer swap con alguien del destino
+        elif new_sol[day][best_zone]:
+            i_target = random.randrange(len(new_sol[day][best_zone]))
+            desk_target, emp_target = new_sol[day][best_zone][i_target]
+            g2 = get_group(emp_target)
+
+            # Verificar que no sea día de reunión para ninguno de los grupos
+            if day not in (group_meeting_days.get(g), group_meeting_days.get(g2)):
+                new_sol[day][best_zone][i_target] = (desk_target, emp_iso)
+                moved = True
+                # Insertar al otro empleado en el origen (swap)
+                for i, (desk, e) in enumerate(new_sol[day][zone_from]):
+                    if e == emp_iso:
+                        new_sol[day][zone_from][i] = (desk, emp_target)
+                        break
+
+        # 🧩 Solo eliminar del origen si el movimiento fue confirmado y no fue swap
+        if moved:
+            # Si el empleado fue agregado a destino pero no hubo swap, eliminar del origen
+            still_there = any(e == emp_iso for _, e in new_sol[day][zone_from])
+            if still_there:
+                new_sol[day][zone_from] = [
+                    (d, e) for d, e in new_sol[day][zone_from] if e != emp_iso
+                ]
+
+        return new_sol
+
  
     # =====================================================
     # Vecindario 5: REASIGNAR ZONA COMPLETA (NUEVO)
@@ -191,12 +268,12 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
             new_sol[day][zone_dest].append((d, emp))
 
     # =====================================================
-    # Vecindario 6: REASIGNAR SEGÚN PREFERENCIAS
+    # Vecindario 6: REASIGNAR SEGÚN PREFERENCIAS (seguro)
     # =====================================================
     elif neighborhood_type == 6:
         if desks_z is None:
             return new_sol
- 
+
         # Escoger empleado aleatoriamente
         all_emps = list(days_e.keys())
         emp = random.choice(all_emps)
@@ -204,10 +281,11 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
         if not g:
             return new_sol
         meeting_day = group_meeting_days.get(g)
- 
+
         # Encontrar el día actual donde está asignado
         current_day = None
         current_zone = None
+        idx_emp = None
         for d, zonas in new_sol.items():
             for z_name, z_data in zonas.items():
                 for i, (desk, e) in enumerate(z_data):
@@ -220,21 +298,21 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
                     break
             if current_day:
                 break
- 
+
         if not current_day:
             return new_sol  # no encontrado
- 
+
         # Si ya está en un día de su preferencia, no hacemos nada
         if current_day in days_e.get(emp, []):
             return new_sol
- 
-        # Buscar un día alternativo que esté en sus preferencias
+
+        # Buscar un día alternativo en sus preferencias
         preferidos = [d for d in days_e.get(emp, []) if d != meeting_day]
         if not preferidos:
             return new_sol
- 
+
         day_to = random.choice(preferidos)
- 
+
         # Buscar zona destino con cupo
         zonas_dest = list(new_sol[day_to].keys())
         ocupados = [desk for zonas in new_sol[day_to].values() for desk, _ in zonas]
@@ -243,22 +321,31 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
         ]
         if not zonas_libres:
             return new_sol
- 
+
         zone_to = random.choice(zonas_libres)
         libres = [d for d in desks_z[zone_to] if d not in ocupados]
         if not libres:
             return new_sol
- 
+
+        # ✅ Confirmar que existe destino antes de tocar nada
         nuevo_desk = random.choice(libres)
- 
-        # Eliminar del día actual
-        del new_sol[current_day][current_zone][idx_emp]
- 
-        # Insertar en el nuevo día / zona
-        new_sol[day_to][zone_to].append((nuevo_desk, emp))
- 
-        return new_sol
+
+        # Intentar mover (insertar primero)
+        try:
+            new_sol[day_to][zone_to].append((nuevo_desk, emp))
+            moved = True
+        except Exception:
+            moved = False
+
+        # 🧩 Eliminar solo si el movimiento fue exitoso
+        if moved:
+            # eliminar la asignación antigua
+            new_sol[current_day][current_zone] = [
+                (d, e) for d, e in new_sol[current_day][current_zone] if e != emp
+            ]
+
     return new_sol
+
 
 # ==============================================================
 # BUSQUEDA LOCAL
@@ -294,7 +381,7 @@ def local_search_vns(sol_inicial, days_e, employees_g, group_meeting_days, k, de
 # ALGORITMO VNS (con búsqueda local dentro de cada vecindario)
 # ==============================================================
 
-def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=1000, sin_mejora_max=200):
+def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=500, sin_mejora_max=50):
     """
     Variable Neighborhood Search (VNS) con búsqueda local en cada vecindario.
 
