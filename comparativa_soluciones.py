@@ -5,6 +5,7 @@ from metodo_constructivo import generar_solucion_desde_archivo
 from score import evaluate_solution
 from metodo_aleatorio import simulated_annealing_assignments
 from metodo_vns import vns_assignments
+from busqueda_local import local_search
 
 
 # ======================================================
@@ -44,6 +45,11 @@ def solution_to_employee_table(sol, days=("L", "Ma", "Mi", "J", "V")) -> pd.Data
 
 archivo = "instances/instance1.json"
 N = 1000
+
+import json
+
+with open(archivo, "r", encoding="utf-8") as f:
+    instance = json.load(f)
 
 # ======================================================
 # 1) MÉTODO ALEATORIO (N corridas)
@@ -99,7 +105,17 @@ best_solution_vns, best_score_vns, trace_vns = vns_assignments(
 elapsed_vns = time.perf_counter() - t3
 
 # ======================================================
-# 5) RESUMEN DE RESULTADOS
+# 5) BÚSQUEDA LOCAL
+# ======================================================
+t4 = time.perf_counter()
+
+best_solution_local_best, best_score_local_best = local_search(archivo, instance, tipo="best")
+best_solution_local_first, best_score_local_first = local_search(archivo, instance, tipo="first")
+
+elapsed_local = time.perf_counter() - t4
+
+# ======================================================
+# 6) RESUMEN DE RESULTADOS
 # ======================================================
 summary = pd.DataFrame([
     {
@@ -146,19 +162,43 @@ summary = pd.DataFrame([
         "best_isolated": best_score_vns[2],
         "total_time_s": elapsed_vns,
     },
+    {
+        "method": "local_search_best",
+        "n_runs": 1,
+        "mean_valid": best_score_local_best[0],
+        "mean_pref": best_score_local_best[1],
+        "mean_isolated": best_score_local_best[2],
+        "best_valid": best_score_local_best[0],
+        "best_pref": best_score_local_best[1],
+        "best_isolated": best_score_local_best[2],
+        "total_time_s": elapsed_local,
+    },
+    {
+        "method": "local_search_first",
+        "n_runs": 1,
+        "mean_valid": best_score_local_first[0],
+        "mean_pref": best_score_local_first[1],
+        "mean_isolated": best_score_local_first[2],
+        "best_valid": best_score_local_first[0],
+        "best_pref": best_score_local_first[1],
+        "best_isolated": best_score_local_first[2],
+        "total_time_s": elapsed_local,
+    },
 ])
 
 print("\n==================== RESUMEN DE MÉTODOS ====================")
 print(summary)
 
 # ======================================================
-# 6) TABLAS DE ASIGNACIÓN POR EMPLEADO
+# 7) TABLAS DE ASIGNACIÓN POR EMPLEADO
 # ======================================================
 
 constructive_table = solution_to_employee_table(constructive_solution)
 random_table = solution_to_employee_table(best_solution)
 annealing_table = solution_to_employee_table(best_solution_annealing)
 vns_table = solution_to_employee_table(best_solution_vns)
+local_table_best = solution_to_employee_table(best_solution_local_best)
+local_table_first = solution_to_employee_table(best_solution_local_first)
 
 print("\n--- Asignaciones por empleado (mejor solución aleatoria) ---")
 print(random_table)
@@ -175,3 +215,11 @@ print(best_score_annealing)
 print("\n--- Asignaciones por empleado (mejor solución con VNS) ---")
 print(vns_table)
 print(best_score_vns)
+
+print("\n--- Asignaciones por empleado (búsqueda local - best improvement) ---")
+print(local_table_best)
+print(best_score_local_best)
+
+print("\n--- Asignaciones por empleado (búsqueda local - first improvement) ---")
+print(local_table_first)
+print(best_score_local_first)
