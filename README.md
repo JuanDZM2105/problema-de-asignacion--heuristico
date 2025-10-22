@@ -153,9 +153,48 @@ El método implementa dos variantes clásicas de búsqueda local:
 | `first` | (*First Improvement*) Acepta la primera mejora que encuentra. Más rápido pero puede converger antes. |
 
 Ambas estrategias repiten el proceso hasta que **no se encuentra ninguna mejora adicional**.
+---
+## Metaheurístico de búsqueda local: Variable Neighborhood Search (VNS)
+Este metaheurístico implementa una versión extendida del algoritmo **VNS (Variable Neighborhood Search)**. El enfoque combina **mutaciones controladas** (vecindarios) con **búsqueda local** dentro de cada vecindario.
 
 ---
 
+## ⚙️ Idea general
+
+El algoritmo VNS parte de una **solución inicial válida** y explora una serie de **vecindarios de diferente naturaleza**.  
+En cada uno:
+1. Se **perturba (shaking)** la solución actual mediante una mutación específica.  
+2. Se ejecuta una **búsqueda local** centrada en ese tipo de vecindario para mejorar la solución.  
+3. Si se encuentra una mejora, el proceso vuelve al primer vecindario; si no, pasa al siguiente.
+
+Este ciclo continúa hasta alcanzar el número máximo de iteraciones o hasta no encontrar mejoras después de varios intentos.
+
+---
+
+## Vecindarios implementados
+
+Cada tipo de vecindario representa un patrón de cambio (*movimiento*) diferente sobre la solución actual:
+
+| Vecindario | Descripción breve | Propósito |
+|-------------|------------------|------------|
+| **N1** | **Swap dentro de la misma zona** | Intercambia empleados que comparten zona y día. Pequeñas mejoras locales. |
+| **N2** | **Swap entre zonas del mismo día** | Mueve empleados entre distintas zonas, manteniendo el día. Favorece el balance entre zonas. |
+| **N3** | **Mover día libre** | Reasigna un empleado a un día alternativo de su preferencia (si tiene cupo). Mejora satisfacción individual. |
+| **N4** | **Reubicar aislado** | Detecta empleados sin compañeros de grupo y los reubica con su equipo. Reduce aislamiento. |
+| **N5** | **Reasignar zona completa** *(nuevo)* | Mueve todos los miembros de un grupo a otra zona con capacidad suficiente. Cambios estructurales más grandes. |
+| **N6** | **Reasignar según preferencias** | Corrige asignaciones de empleados que trabajan en días no preferidos. Mejora satisfacción sin romper restricciones. |
+
+Cada mutación garantiza que las restricciones de grupos, cupos y días de reunión se respeten.
+
+---
+
+## 🔍 Búsqueda local dentro de cada vecindario
+
+Después de aplicar una mutación (`shaking`), el algoritmo ejecuta una **búsqueda local** (`local_search_vns`):
+
+- Explora el vecindario actual hasta que **no se encuentren más mejoras**.
+- Usa estrategia *first-improvement*: acepta la primera mejora detectada (más rápida).
+- La evaluación de cada solución se realiza con `evaluate_solution`, que devuelve una tupla con los indicadores:
 ---
 
 ## 🚀 Ejecución
