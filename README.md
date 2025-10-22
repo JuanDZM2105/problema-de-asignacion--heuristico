@@ -153,13 +153,14 @@ El método implementa dos variantes clásicas de búsqueda local:
 | `first` | (*First Improvement*) Acepta la primera mejora que encuentra. Más rápido pero puede converger antes. |
 
 Ambas estrategias repiten el proceso hasta que **no se encuentra ninguna mejora adicional**.
+
 ---
 ## Metaheurístico de búsqueda local: Variable Neighborhood Search (VNS)
 Este metaheurístico implementa una versión extendida del algoritmo **VNS (Variable Neighborhood Search)**. El enfoque combina **mutaciones controladas** (vecindarios) con **búsqueda local** dentro de cada vecindario.
 
 ---
 
-## ⚙️ Idea general
+## Idea general
 
 El algoritmo VNS parte de una **solución inicial válida** y explora una serie de **vecindarios de diferente naturaleza**.  
 En cada uno:
@@ -188,7 +189,7 @@ Cada mutación garantiza que las restricciones de grupos, cupos y días de reuni
 
 ---
 
-## 🔍 Búsqueda local dentro de cada vecindario
+## Búsqueda local dentro de cada vecindario
 
 Después de aplicar una mutación (`shaking`), el algoritmo ejecuta una **búsqueda local** (`local_search_vns`):
 
