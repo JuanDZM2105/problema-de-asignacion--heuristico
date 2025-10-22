@@ -37,7 +37,7 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 
 ---
 
-## ⚙️ Descripción de archivos principales
+## Descripción de archivos principales
 
 - **`instances/`**  
   Contiene las instancias de prueba (archivos `.json`) con la definición de:
