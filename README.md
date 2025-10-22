@@ -5,6 +5,29 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 
 ---
 
+# Índice
+
+1. [Introducción](#proyecto-heurística--asignación-de-escritorios)  
+2. [Estructura del proyecto](#-estructura-del-proyecto)  
+3. [Descripción de archivos principales](#-descripción-de-archivos-principales)  
+4. [Resultados de Métodos de Asignación de Empleados](#resultados-de-métodos-de-asignación-de-empleados)  
+   4.1. [Métodos incluidos](#métodos-incluidos)  
+   4.2. [Archivos generados y estructura](#archivos-generados-y-estructura)  
+       4.2.1. [Resumen general de métodos (summary)](#1-resumen-general-de-métodos-summary)  
+       4.2.2. [Tablas de asignación por empleado](#2-tablas-de-asignación-por-empleado)  
+5. [Entrega 2: Búsqueda Local y Metaheurístico VNS](#entrega-2-búsqueda-local)  
+   5.1. [Descripción del método](#descripción-del-método)  
+   5.2. [Vecindario utilizado](#vecindario-utilizado)  
+   5.3. [Estrategias de mejora](#estrategias-de-mejora)  
+   5.4. [Metaheurístico: Variable Neighborhood Search (VNS)](#metaheurístico-de-búsqueda-local-variable-neighborhood-search-vns)  
+       5.4.1. [Idea general](#idea-general)  
+       5.4.2. [Vecindarios implementados](#vecindarios-implementados)  
+       5.4.3. [Búsqueda local dentro de cada vecindario](#búsqueda-local-dentro-de-cada-vecindario)  
+6. [Ejecución del programa](#-ejecución)  
+7. [Autor y créditos](#️-autor-y-créditos)
+
+---
+
 ## 📂 Estructura del proyecto
 
 ├── instances/ -> Conjunto de instancias en formato JSON (datos de entrada) <br>
@@ -182,7 +205,7 @@ Cada tipo de vecindario representa un patrón de cambio (*movimiento*) diferente
 | **N2** | **Swap entre zonas del mismo día** | Mueve empleados entre distintas zonas, manteniendo el día. Favorece el balance entre zonas. |
 | **N3** | **Mover día libre** | Reasigna un empleado a un día alternativo de su preferencia (si tiene cupo). Mejora satisfacción individual. |
 | **N4** | **Reubicar aislado** | Detecta empleados sin compañeros de grupo y los reubica con su equipo. Reduce aislamiento. |
-| **N5** | **Reasignar zona completa** *(nuevo)* | Mueve todos los miembros de un grupo a otra zona con capacidad suficiente. Cambios estructurales más grandes. |
+| **N5** | **Reasignar zona completa** | Mueve todos los miembros de un grupo a otra zona con capacidad suficiente. Cambios estructurales más grandes. |
 | **N6** | **Reasignar según preferencias** | Corrige asignaciones de empleados que trabajan en días no preferidos. Mejora satisfacción sin romper restricciones. |
 
 Cada mutación garantiza que las restricciones de grupos, cupos y días de reunión se respeten.
