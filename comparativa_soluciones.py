@@ -42,7 +42,7 @@ def solution_to_employee_table(sol, days=("L", "Ma", "Mi", "J", "V")) -> pd.Data
 # CONFIGURACIÓN GENERAL
 # ======================================================
 
-archivo = "instances/instance10.json"
+archivo = "instances/instance1.json"
 N = 1000
 
 # ======================================================
