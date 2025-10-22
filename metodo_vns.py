@@ -351,7 +351,7 @@ def mutate_solution_vns(sol, days_e, employees_g, group_meeting_days, neighborho
 # BUSQUEDA LOCAL
 # ==============================================================
 
-def local_search_vns(sol_inicial, days_e, employees_g, group_meeting_days, k, desk_z, path_json, max_intentos=1000):
+def local_search_vns(sol_inicial, days_e, employees_g, group_meeting_days, k, desk_z, path_json, max_intentos=50):
     """
     Realiza búsqueda local en el vecindario k.
     Genera múltiples mutaciones del mismo tipo (vecindario k)
@@ -409,19 +409,19 @@ def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=50
     iter_count = 0
 
     while iter_count < max_iter and sin_mejora < sin_mejora_max:
+        iter_count += 1
         for k in vecindarios:
-            iter_count += 1
             print(iter_count)
 
-            # 1️⃣ SHAKING — muta solución actual para escapar de óptimos
+            # SHAKING — muta solución actual para escapar de óptimos
             neighbor = mutate_solution_vns(current_solution, days_e, employees_g, group_meeting_days, k, desks_z)
 
-            # 2️⃣ BÚSQUEDA LOCAL — mejora dentro del mismo vecindario
+            # BÚSQUEDA LOCAL — mejora dentro del mismo vecindario
             neighbor, neighbor_score = local_search_vns(
                 neighbor, days_e, employees_g, group_meeting_days, k, desks_z, path_json
             )
 
-            # 3️⃣ EVALUACIÓN Y ACTUALIZACIÓN
+            # EVALUACIÓN Y ACTUALIZACIÓN
             if neighbor_score < current_score:
                 print(f"Iter {iter_count}: Mejora en vecindario {k} de {current_score} a {neighbor_score}")
                 current_solution = neighbor
