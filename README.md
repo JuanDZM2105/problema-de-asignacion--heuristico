@@ -7,15 +7,17 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 
 ## 📂 Estructura del proyecto
 
-├── instances/ # Conjunto de instancias en formato JSON (datos de entrada) <br>
-├── resultados_excel/ # Resultados exportados en archivos Excel (salida del programa)<br>
+├── instances/ -> Conjunto de instancias en formato JSON (datos de entrada) <br>
+├── resultados_excel/ -> Resultados exportados en archivos Excel (salida del programa)<br>
+├── bsuqueda_local.py -> Método de búsqueda local<br>
 ├── README.md # Documentación del proyecto<br>
-├── comparativa_soluciones.py # Script principal: ejecuta los 3 métodos y compara resultados<br>
-├── metodo_aleatorio.py # Implementación de recocido simulado (simulated annealing)<br>
-├── metodo_constructivo.py # Método constructivo determinista (greedy)<br>
+├── comparativa_soluciones.py -> Script principal: ejecuta los 3 métodos y compara resultados<br>
+├── metodo_aleatorio.py -> Implementación de recocido simulado (simulated annealing)<br>
+├── metodo_constructivo.py -> Método constructivo determinista)<br>
 ├── metodo_constructivo_aleatorio.py # Método constructivo aleatorio<br>
-├── score.py # Funciones de evaluación de soluciones<br>
-├── poster.py # poster en pdf<br>
+├── metodo_vns.py -> Metaheuristico de búsqueda local<br>
+├── score.py -> Funciones de evaluación de soluciones<br>
+├── poster.py -> poster en pdf<br>
 
 
 ---
@@ -136,6 +138,3 @@ Ejemplo de uso en terminal:
 
 ```bash
 python comparativa_soluciones.py
-
-
-
