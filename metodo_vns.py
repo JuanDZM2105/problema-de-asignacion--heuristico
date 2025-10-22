@@ -294,7 +294,7 @@ def local_search_vns(sol_inicial, days_e, employees_g, group_meeting_days, k, de
 # ALGORITMO VNS (con búsqueda local dentro de cada vecindario)
 # ==============================================================
 
-def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=100000, sin_mejora_max=1000):
+def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=1000, sin_mejora_max=200):
     """
     Variable Neighborhood Search (VNS) con búsqueda local en cada vecindario.
 
