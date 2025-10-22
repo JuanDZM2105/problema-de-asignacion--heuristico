@@ -8,7 +8,7 @@ Este proyecto implementa distintos **métodos heurísticos y metaheurísticos** 
 # Índice
  
 1. [Estructura del proyecto](#-estructura-del-proyecto)  
-2. [Descripción de archivos principales](#-descripción-de-archivos-principales)  
+2. [Descripción de archivos principales](#descripción-de-archivos-principales)  
 3. [Resultados de Métodos de Asignación de Empleados](#resultados-de-métodos-de-asignación-de-empleados)  
    3.1. [Métodos incluidos](#métodos-incluidos)  
    3.2. [Archivos generados y estructura](#archivos-generados-y-estructura)  
