@@ -5,6 +5,7 @@ from metodo_constructivo import generar_solucion_desde_archivo
 from metodo_constructivo_aleatorio import randomized_solution_desde_archivo
 from metodo_aleatorio import simulated_annealing_assignments
 from metodo_vns import vns_assignments
+from busqueda_local import local_search  # 🧩 Nuevo import
 from score import evaluate_solution
 
 
@@ -108,31 +109,47 @@ def procesar_instancia(path_json: str):
     employees_g = instance["Employees_G"]
     groups = list(employees_g.keys())
 
+    # =====================================================
+    # MÉTODOS HEURÍSTICOS
+    # =====================================================
     constructive_solution, constructive_groups = generar_solucion_desde_archivo(path_json)
     randomized_solution, randomized_groups = randomized_solution_desde_archivo(path_json)
     annealing_solution, _, _ = simulated_annealing_assignments(constructive_solution, constructive_groups, path_json)
     vns_solution, _, _ = vns_assignments(constructive_solution, constructive_groups, path_json)
 
-    # Crear DataFrames de asignación
+    # =====================================================
+    # BÚSQUEDA LOCAL (nuevo)
+    # =====================================================
+    print("⚙️ Ejecutando búsqueda local (mejor mejora)...")
+    local_solution, _ = local_search(path_json, instance, tipo="best")
+
+    # =====================================================
+    # CREAR DATAFRAMES DE ASIGNACIÓN
+    # =====================================================
     df_constructive = solution_to_employee_table(constructive_solution)
     df_randomized = solution_to_employee_table(randomized_solution)
     df_annealing = solution_to_employee_table(annealing_solution)
     df_vns = solution_to_employee_table(vns_solution)
+    df_local = solution_to_employee_table(local_solution)
 
     # Crear DataFrame de grupos sin encabezado
     df_group_days = pd.DataFrame([[g, constructive_groups.get(g, "None")] for g in groups])
 
-    # Crear DataFrames de resumen
+    # =====================================================
+    # CREAR DATAFRAMES DE RESUMEN
+    # =====================================================
     df_summary_constructive = calcular_resumen(constructive_solution, instance)
     df_summary_randomized = calcular_resumen(randomized_solution, instance)
     df_summary_annealing = calcular_resumen(annealing_solution, instance)
     df_summary_vns = calcular_resumen(vns_solution, instance)
+    df_summary_local = calcular_resumen(local_solution, instance)
 
     resultados = {
         "constructive": {"solution": df_constructive, "summary": df_summary_constructive},
         "randomized": {"solution": df_randomized, "summary": df_summary_randomized},
         "annealing": {"solution": df_annealing, "summary": df_summary_annealing},
         "vns": {"solution": df_vns, "summary": df_summary_vns},
+        "local_search": {"solution": df_local, "summary": df_summary_local},
         "group_days": df_group_days,
     }
 
@@ -160,7 +177,7 @@ def procesar_todas_las_instancias(instances_folder="instances"):
 
 def guardar_resultados_en_excel(resultados, output_folder="resultados"):
     os.makedirs(output_folder, exist_ok=True)
-    metodos = ["constructive", "randomized", "annealing", "vns"]
+    metodos = ["constructive", "randomized", "annealing", "vns", "local_search"]
 
     for metodo in metodos:
         metodo_dir = os.path.join(output_folder, metodo)

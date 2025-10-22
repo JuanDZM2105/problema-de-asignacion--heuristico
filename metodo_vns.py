@@ -410,8 +410,8 @@ def vns_assignments(initial_solution, group_meeting_days, path_json, max_iter=50
 
     while iter_count < max_iter and sin_mejora < sin_mejora_max:
         iter_count += 1
+        print(iter_count)
         for k in vecindarios:
-            print(iter_count)
 
             # SHAKING — muta solución actual para escapar de óptimos
             neighbor = mutate_solution_vns(current_solution, days_e, employees_g, group_meeting_days, k, desks_z)
